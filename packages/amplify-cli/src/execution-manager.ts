@@ -1,6 +1,7 @@
+import fs from 'fs-extra'; 
 import Context from './domain/context';
 import Constant from './domain/constants'; 
-import { getPluginsWithNameAndCommand, getPluginsWithEventHandler } from './plugin-manager';
+import { scan, getPluginsWithNameAndCommand, getPluginsWithEventHandler } from './plugin-manager';
 import PluginInfo from './domain/plugin-info';
 import inquirer from './domain/inquirer-helper';
 import { 
@@ -41,11 +42,18 @@ async function executePluginModuleCommand(context: Context, plugin: PluginInfo) 
     if (!commands!.includes(context.input.command!)) {
         context.input.command = commandAliases![context.input.command!];
     }
-    const pluginModule = require(plugin.packageLocation);
 
-    await raisePreEvent(context); 
-    await pluginModule.executeAmplifyCommand(context);
-    await raisePostEvent(context); 
+    if(fs.existsSync(plugin.packageLocation)){
+        const pluginModule = require(plugin.packageLocation);
+        await raisePreEvent(context); 
+        await pluginModule.executeAmplifyCommand(context);
+        await raisePostEvent(context); 
+    }else{
+        await scan(); 
+        context.print.error('The Amplify CLI plugin platform detected an error.');
+        context.print.info('It has performed a fresh scan.'); 
+        context.print.info('Please execute your command again.');
+    }
 }
 
 async function raisePreEvent(context: Context){
@@ -100,10 +108,16 @@ export async function raiseEvent(context: Context, args: AmplifyEventArgs){
     const plugins = getPluginsWithEventHandler(context.pluginPlatform, args.event);
     if(plugins.length > 0){
         const sequential = require('promise-sequential'); 
-        const eventHandlers = plugins.map((plugin)=>{
-            const pluginModule = require(plugin.packageLocation);
+        const eventHandlers = plugins.filter((plugin)=>{
+            return fs.existsSync(plugin.packageLocation);
+        }).map((plugin)=>{
             return async () => {
-                await pluginModule.handleAmplifyEvent(context, args);
+                try{
+                    const pluginModule = require(plugin.packageLocation);
+                    await pluginModule.handleAmplifyEvent(context, args);
+                }catch{
+                    //no need to need anything
+                }
             };
         });
         await sequential(eventHandlers); 
