@@ -7,6 +7,8 @@ import inquirer from '../../domain/inquirer-helper';
 import Constants from '../../domain/constants';
 import { writePluginsJsonFileSync } from '../../plugin-helpers/access-plugins-file';
 import { scan } from '../../plugin-manager';
+import { displayPluginDirectories, displayPrefixes, displayScanInterval,
+    displayConfiguration } from '../../plugin-helpers/display-plugin-platform'; 
 
 export default async function configure(context: Context): Promise<PluginPlatform> {
     const { pluginPlatform } = context;
@@ -46,7 +48,8 @@ export default async function configure(context: Context): Promise<PluginPlatfor
                 await configureScanInterval(context, pluginPlatform);
                 break;
             case list: 
-                await listAllConfigurations(context, pluginPlatform);
+                displayConfiguration(context, pluginPlatform); 
+                break;
         }
     } while (answer.selection !== exit);
 
@@ -56,10 +59,7 @@ export default async function configure(context: Context): Promise<PluginPlatfor
 }
 
 async function configurePluginDirectories(context: Context, pluginPlatform: PluginPlatform) {
-    context.print.info('');
-    context.print.info('Directories the Amplify CLI currently scans for plugins:')
-    context.print.info(pluginPlatform.pluginDirectories);
-    context.print.info('');
+    displayPluginDirectories(context, pluginPlatform);
 
     const ADD = 'add';
     const REMOVE = 'remove'; 
@@ -78,10 +78,7 @@ async function configurePluginDirectories(context: Context, pluginPlatform: Plug
         await removePluginDirectory(pluginPlatform);
     }
     
-    context.print.info('');
-    context.print.info('The updated directories the Amplify CLI scans for plugins:')
-    context.print.info(pluginPlatform.pluginDirectories);
-    context.print.info('');
+    displayPluginDirectories(context, pluginPlatform);
 }
 
 async function addPluginDirectory(pluginPlatform: PluginPlatform) {
@@ -143,10 +140,7 @@ async function removePluginDirectory(pluginPlatform: PluginPlatform) {
 }
 
 async function configurePrefixes(context: Context, pluginPlatform: PluginPlatform) {
-    context.print.info(''); 
-    context.print.info('Package name prefixes the Amplify CLI currently uses when scanning for plugins:')
-    context.print.info(pluginPlatform.pluginPrefixes);
-    context.print.info(''); 
+    displayPrefixes(context, pluginPlatform);
 
     const ADD = 'add';
     const REMOVE = 'remove'; 
@@ -169,10 +163,7 @@ async function configurePrefixes(context: Context, pluginPlatform: PluginPlatfor
         }
     }
     
-    context.print.info(''); 
-    context.print.info('The updated prefixes the Amplify CLI uses when scanning for plugins:')
-    context.print.info(pluginPlatform.pluginPrefixes);
-    context.print.info(''); 
+    displayPrefixes(context, pluginPlatform);
 }
 
 async function addPrefix(pluginPlatform: PluginPlatform) {
@@ -235,6 +226,7 @@ async function removePrefixes(pluginPlatform: PluginPlatform) {
 }
 
 async function configureScanInterval(context: Context, pluginPlatform: PluginPlatform) {
+    displayScanInterval(context, pluginPlatform);
     const answer = await inquirer.prompt({
         type: 'input',
         name: 'interval',
@@ -248,6 +240,7 @@ async function configureScanInterval(context: Context, pluginPlatform: PluginPla
         }
     });
     pluginPlatform.maxScanIntervalInSeconds = parseInt(answer.interval);
+    displayScanInterval(context, pluginPlatform);
 }
 
 export async function listConfiguration(context: Context, pluginPlatform: PluginPlatform) {
@@ -272,33 +265,19 @@ export async function listConfiguration(context: Context, pluginPlatform: Plugin
 
     switch (answer.selection) {
         case pluginDirectories:
-            context.print.info(pluginPlatform.pluginDirectories);
+            displayPluginDirectories(context, pluginPlatform);
             break;
         case pluginPrefixes:
-            context.print.info(pluginPlatform.pluginPrefixes);
+            displayPrefixes(context, pluginPlatform);
             break;
         case maxScanIntervalInSeconds:
-            context.print.info(pluginPlatform.maxScanIntervalInSeconds);
+            displayScanInterval(context, pluginPlatform);
             break;
         case all:
-            listAllConfigurations(context, pluginPlatform);
+            displayConfiguration(context, pluginPlatform); 
             break;
         default:
-            listAllConfigurations(context, pluginPlatform);
+            displayConfiguration(context, pluginPlatform); 
             break;
     }
-}
-
-function listAllConfigurations(context: Context, pluginPlatform: PluginPlatform) {
-    const displayObject = {
-        ...pluginPlatform
-    }
-    delete displayObject.userAddedLocations;
-    delete displayObject.lastScanTime;
-    delete displayObject.plugins;
-    delete displayObject.excluded;
-
-    context.print.info('');
-    context.print.info(util.inspect(displayObject, undefined, Infinity));
-    context.print.info('');
 }

@@ -1,9 +1,8 @@
 import Context from '../../domain/context';
-import PluginPlatform from '../../domain/plugin-platform';
 import inquirer from '../../domain/inquirer-helper';
-import { listConfiguration } from './configure';
-import util from 'util';
 import PluginCollection from '../../domain/plugin-collection';
+import { displayConfiguration, displayGeneralInfo, 
+    displayPluginCollection, displayPluginInfoArray, displayPluginPlatform } from '../../plugin-helpers/display-plugin-platform'; 
 
 export default async function list(context: Context) {
     const { pluginPlatform } = context;
@@ -32,54 +31,24 @@ export default async function list(context: Context) {
 
     switch (answer.selection) {
         case plugins:
-            await listPlugins(context, pluginPlatform);
+            listPluginCollection(context, pluginPlatform.plugins);
             break;
         case excluded:
-            await listExcluded(context, pluginPlatform);
+            listPluginCollection(context, pluginPlatform.excluded);
             break;
         case generalInfo:
-            await listGeneralInfo(context, pluginPlatform);
+            displayGeneralInfo(context, pluginPlatform);
             break;
         case configuration:
-            await listConfiguration(context, pluginPlatform);
+            displayConfiguration(context, pluginPlatform);
             break;
         case all:
-            listAll(context, pluginPlatform);
+            displayPluginPlatform(context, pluginPlatform);
             break;
         default:
-            listPlugins(context, pluginPlatform);
+            listPluginCollection(context, pluginPlatform.plugins);
             break;
     }
-}
-
-function listGeneralInfo(context: Context, pluginPlatform: PluginPlatform) {
-    const displayObject = {
-        ...pluginPlatform
-    }
-    delete displayObject.plugins;
-    delete displayObject.excluded;
-
-    context.print.info('');
-    context.print.info(util.inspect(displayObject, undefined, Infinity));
-    context.print.info('');
-}
-
-function listAll(context: Context, pluginPlatform: PluginPlatform) {
-    context.print.info('');
-    context.print.info(util.inspect(pluginPlatform, undefined, Infinity));
-    context.print.info('');
-}
-
-async function listPlugins(context: Context, pluginPlatform: PluginPlatform) {
-    context.print.info('');
-    await listPluginCollection(context, pluginPlatform.plugins);
-    context.print.info('');
-}
-
-async function listExcluded(context: Context, pluginPlatform: PluginPlatform) {
-    context.print.info('');
-    await listPluginCollection(context, pluginPlatform.excluded);
-    context.print.info('');
 }
 
 async function listPluginCollection(context: Context, collection: PluginCollection) {
@@ -99,9 +68,9 @@ async function listPluginCollection(context: Context, collection: PluginCollecti
         }
 
         if (toList === all) {
-            context.print.info(util.inspect(collection, undefined, Infinity));
+            displayPluginCollection(context, collection);
         } else {
-            context.print.info(util.inspect(collection[toList], undefined, Infinity));
+            displayPluginInfoArray(context, collection[toList]);
         }
     } else {
         context.print.info('The collection is empty');

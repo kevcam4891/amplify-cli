@@ -1,12 +1,12 @@
 import Context from './domain/context';
 import Input from './domain/input';
 import PluginPlatform from './domain/plugin-platform';
-import { attachCliExtentions } from './cli-helper';
+import { attachExtentions } from './context-extensions';
 
 export function constructContext(pluginPlatform: PluginPlatform, input: Input): Context {
     const context = new Context(pluginPlatform, input);
 
-    attachCliExtentions(context);
+    attachExtentions(context);
 
     return context;
 }
