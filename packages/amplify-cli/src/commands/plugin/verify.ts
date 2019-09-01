@@ -1,7 +1,7 @@
 import Context from '../../domain/context';
 import { verifyPlugin } from '../../plugin-manager';
 
-export default async function verify(context: Context) {
+export async function run(context: Context) {
     const verificatonResult = await verifyPlugin(process.cwd());
     if(verificatonResult.verified){
         context.print.success('The current directory is verified to be a valid Amplify CLI plugin package.');

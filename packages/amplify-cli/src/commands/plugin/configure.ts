@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import util from 'util';
 import os from 'os'; 
 import Context from '../../domain/context';
 import PluginPlatform from '../../domain/plugin-platform';
@@ -10,7 +9,7 @@ import { scan } from '../../plugin-manager';
 import { displayPluginDirectories, displayPrefixes, displayScanInterval,
     displayConfiguration } from '../../plugin-helpers/display-plugin-platform'; 
 
-export default async function configure(context: Context): Promise<PluginPlatform> {
+export async function run(context: Context): Promise<PluginPlatform> {
     const { pluginPlatform } = context;
     const pluginDirectories = 'plugin directories';
     const pluginPrefixes = 'plugin prefixes';

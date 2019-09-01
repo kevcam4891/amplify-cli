@@ -1,47 +1,27 @@
-import add from './plugin/add';
-import configure from './plugin/configure';
-import newplugin from './plugin/new';
-import list from './plugin/list';
-import remove from './plugin/remove';
-import scan from './plugin/scan';
-import verify from './plugin/verify';
-import help from './plugin/help';
+import path from 'path'; 
 import Context from '../domain/context';
 
 export async function run(context: Context) {
-    let subcommand = 'help'; 
+    let subCommand = 'help'; 
 
     if(context.input.subCommands && context.input.subCommands.length > 0){
-        subcommand = context.input.subCommands![0];
+        subCommand = context.input.subCommands![0];
     }
+    subCommand = mapSubcommandAlias(subCommand); 
 
-    switch (subcommand) {
-        case 'add':
-            await add(context);
-            break;
-        case 'configure':
-            await configure(context);
-            break;
-        case 'new':
-            await newplugin(context);
-            break;
-        case 'init':
-            await newplugin(context);
-            break;
-        case 'list':
-            await list(context);
-            break;
-        case 'remove':
-            await remove(context);
-            break;
-        case 'scan':
-            await scan(context);
-            break;
-        case 'verify':
-            await verify(context);
-            break;
-        case 'help':
-            await help(context);
-            break;
+    const subCommandPath = path.normalize(path.join(__dirname, 'plugin', subCommand));
+    import(subCommandPath)
+    .then(async (subCommandModule)=>{
+        await subCommandModule.run(context);
+    })
+    .catch((err)=>{
+        context.print.error(`Can not load command amplify plugin ${subCommand}`);
+    })
+}
+
+function mapSubcommandAlias(subcommand: string): string{
+    if(subcommand === 'init'){
+        return 'new'; 
     }
+    return subcommand; 
 }

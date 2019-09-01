@@ -1,6 +1,6 @@
 import Context from '../../domain/context';
 
-export default function help(context: Context) {
+export function run(context: Context) {
     context.print.info(''); 
 
     const commands = [
@@ -41,7 +41,8 @@ export default function help(context: Context) {
     for (let i = 0; i < commands.length; i += 1) {
         tableOptions.push([commands[i].name, commands[i].description]);
     }
+    context.print.info('Subcommands for amplify plugin:'); 
+    context.print.info(''); 
     context.print.table(tableOptions, { format: 'default' });
-
     context.print.info(''); 
 }

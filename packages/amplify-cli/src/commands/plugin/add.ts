@@ -13,7 +13,7 @@ import { AddPluginError } from '../../domain/add-plugin-result';
 const NEWPLUGINPACKAGE = 'A new plugin package';
 
 
-export default async function add(context: Context) {
+export async function run(context: Context) {
     const options = new Array<InquirerOption>();
     const { excluded } =  context.pluginPlatform;
     if (excluded && Object.keys(excluded).length > 0) {

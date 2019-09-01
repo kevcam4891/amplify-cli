@@ -4,7 +4,7 @@ import PluginCollection from '../../domain/plugin-collection';
 import { displayConfiguration, displayGeneralInfo, 
     displayPluginCollection, displayPluginInfoArray, displayPluginPlatform } from '../../plugin-helpers/display-plugin-platform'; 
 
-export default async function list(context: Context) {
+export async function run(context: Context) {
     const { pluginPlatform } = context;
 
     const plugins = 'plugins';

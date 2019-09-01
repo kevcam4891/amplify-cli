@@ -6,7 +6,7 @@ import { addUserPluginPackage, confirmAndScan } from '../../plugin-manager';
 import { AddPluginError } from '../../domain/add-plugin-result';
 import path from 'path';
 
-export default async function newplugin(context: Context) {
+export async function run(context: Context) {
     const pluginDirPath = await newPlugin(context, process.cwd());
     if (pluginDirPath) {
         const isPluggedInLocalAmplifyCLI = await plugIntoLocalAmplifyCli(context, pluginDirPath);

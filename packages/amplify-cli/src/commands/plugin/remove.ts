@@ -5,7 +5,7 @@ import Constant from '../../domain/constants';
 import inquirer, {InquirerOption, EXPAND } from '../../domain/inquirer-helper';
 import PluginInfo from '../../domain/plugin-info';
 
-export default async function remove(context: Context) {
+export async function run(context: Context) {
     const options = new Array<InquirerOption>();
     const {
         plugins
