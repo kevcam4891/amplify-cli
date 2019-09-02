@@ -4,9 +4,12 @@ import inquirer from '../domain/inquirer-helper';
 import Context from '../domain/context';
 import Constant from '../domain/constants'
 import { AmplifyEvent } from '../domain/amplify-event';
+import { AmplifyPluginType } from '../domain/amplify-plugin-type';
 import { readJsonFileSync } from '../utils/readJsonFile';
 import constants from '../domain/constants';
 import { validPluginNameSync } from './verify-plugin'; 
+import { createIndentation } from './display-plugin-platform'; 
+
 
 export default async function newPlugin(context: Context, pluginParentDirPath: string): Promise<string | undefined>  {
     const pluginName = await getPluginName(context, pluginParentDirPath);
@@ -63,49 +66,132 @@ async function getPluginName(context: Context, pluginParentDirPath: string): Pro
 
 
 async function copyTemplateFiles(context: Context, pluginParentDirPath: string, pluginName: string) {
-    const yesFlag = context.input.options && context.input.options[Constant.YES];
-
     const pluginDirPath = path.join(pluginParentDirPath, pluginName);
     fs.emptyDirSync(pluginDirPath);
     const srcDirPath = path.join(__dirname, '../../templates/new-plugin-package-js');
     fs.copySync(srcDirPath, pluginDirPath);
 
-    const pluginTypes = [
-        'category',
-        'frontend',
-        'provider',
-        'util'
-    ];
-    let pluginType = pluginTypes[0];
-    let eventHandlers = Object.keys(AmplifyEvent);
-
-    if (!yesFlag) {
-        const questions = [
-            {
-                type: 'list',
-                name: 'pluginType',
-                message: 'Specify the plugin type',
-                choices: pluginTypes,
-                default: pluginType
-            },
-            {
-                type: 'checkbox',
-                name: 'eventHandlers',
-                message: 'What Amplify CLI events does the plugin subscribe to?',
-                choices: eventHandlers,
-                default: eventHandlers
-            }
-        ];
-        let answers = await inquirer.prompt(questions);
-        pluginType = answers.pluginType;
-        eventHandlers = answers.eventHandlers;
-    }
+    const pluginType = await promptForPluginType(context);
+    const eventHandlers = await promptForEventSubscription(context);
 
     updatePackageJson(pluginDirPath, pluginName);
     updateAmplifyPluginJson(pluginDirPath, pluginName, pluginType, eventHandlers);
     updateEventHandlersFolder(pluginDirPath, eventHandlers);
 
     return pluginDirPath;
+}
+
+async function promptForPluginType(context: Context): Promise<string> {
+    const yesFlag = context.input.options && context.input.options[Constant.YES];
+
+    if (yesFlag) {
+        return AmplifyPluginType.util;
+    }else{
+        const pluginTypes = Object.keys(AmplifyPluginType);
+        const LEARNMORE = 'Learn more about Amplify CLI plugin types'; 
+        const choices = pluginTypes.concat([LEARNMORE]);
+        const answer = await inquirer.prompt(
+            {
+                type: 'list',
+                name: 'selection',
+                message: 'Specify the plugin type',
+                choices: choices,
+                default: AmplifyPluginType.util
+            });
+        if(answer.selection === LEARNMORE){
+            displayAmplifyPluginTypesLearnMore(context);
+            return await promptForPluginType(context);
+        }else{
+            return  AmplifyPluginType.util; 
+        }
+    }
+}
+
+function displayAmplifyPluginTypesLearnMore(context: Context){
+    const indentationStr = createIndentation(4); 
+    context.print.green('The Amplify CLI supports these plugin types:'); 
+    context.print.blue(AmplifyPluginType.category); 
+    context.print.green(`${AmplifyPluginType.category} plugins allows the CLI \
+user to add, remove and configure a set of backend resources, \
+they use provider plugins to setup and update the actual resources in the cloud. \
+The Amplify CLI Core does not have special handling for ${AmplifyPluginType.category} plugins.`);
+    context.print.blue(AmplifyPluginType.provider); 
+    context.print.green(`${AmplifyPluginType.provider} plugins expose methods \
+for other plugins to properly setup and update resources in the cloud, they are responsible for \
+the details of initialzing and maintaining communications with cloud services, e.g. AWS. \
+The Ammplify CLI Core prompts the user to select ${AmplifyPluginType.provider} plugins to \
+initialize during the execution of the amplify init command, and then invoke the init method of \
+the selected ${AmplifyPluginType.provider} plugins. \
+The Amplify CLI core will invoke the initialized ${AmplifyPluginType.provider} plugins' \
+push method when amplify push command is executed.`);
+    context.print.blue(AmplifyPluginType.frontend); 
+    context.print.green(`${AmplifyPluginType.frontend} plugins detect \
+the frontend framework used by the frontend project, and elect to handle the frontend project. \
+Among other things, they generate the configuration file for the frontend libraries, \
+e.g. the aws-exports.js file for the amplify js library. \
+The Amplify CLI core invokes the scanProject methods of all the \
+${AmplifyPluginType.frontend} plugins, the one that return the highest score \
+is selected to handle the frontend project. \
+Each time when the backend resources are updated, the createFrontendConfigs method of the \
+selected ${AmplifyPluginType.frontend} plugin is invoked to generate or update \
+the frontend configuration file.`);
+    context.print.blue(AmplifyPluginType.util); 
+    context.print.green(`${AmplifyPluginType.util} plugins are general purpose \
+utility plugins, they provide utility functions for other plugins. The Amplify CLI Core does not \
+have special handling for ${AmplifyPluginType.category} plugins.`);
+}
+
+async function promptForEventSubscription(context: Context): Promise<string[]>{
+    const yesFlag = context.input.options && context.input.options[Constant.YES];
+    const eventHandlers = Object.keys(AmplifyEvent);
+
+    if (yesFlag) {
+        return eventHandlers;
+    }else{
+        const LEARNMORE = 'Learn more about Amplify CLI events'; 
+        const choices = eventHandlers.concat([LEARNMORE]);
+        const answer = await inquirer.prompt(
+            {
+                type: 'checkbox',
+                name: 'selections',
+                message: 'What Amplify CLI events does the plugin subscribe to?',
+                choices: choices,
+                default: eventHandlers
+            });
+        if(answer.selections.includes(LEARNMORE)){
+            displayAmplifyEventsLearnMore(context);
+            return await promptForEventSubscription(context);
+        }else{
+            return answer.selections; 
+        }
+    }
+}
+
+function displayAmplifyEventsLearnMore(context: Context){
+    const indentationStr = createIndentation(4); 
+    context.print.green('The Amplify CLI aims to provide a flexible and loosely-coupled \
+pluggable platforms for the plugins.'); 
+    context.print.green('In order to achieve plugin-and-play for plugins of all types, \
+so to eliminate the need for Amplify CLI core to explicitly reference plugin packages as \
+dependencies, the platform broadcasts events for plugins to handle.'); 
+    context.print.green('If a plugin subscribes to an event, its event handler is \
+invoked by the Amplify CLI Core on such event.'); 
+    context.print.green(''); 
+    context.print.green('The Amplify CLI current broadcasts these events to plugins:'); 
+    context.print.blue(AmplifyEvent.PreInit); 
+    context.print.green(`${indentationStr}${AmplifyEvent.PreInit} is raised prior to the \
+execution of the amplify init command.`);
+    context.print.blue(AmplifyEvent.PostInit); 
+    context.print.green(`${indentationStr}${AmplifyEvent.PostInit} is raised on the complete \
+execution of the amplify init command.`);
+    context.print.blue(AmplifyEvent.PrePush); 
+    context.print.green(`${indentationStr}${AmplifyEvent.PrePush} is raised prior to the \
+executionof the amplify push command.`);
+    context.print.blue(AmplifyEvent.PostPush); 
+    context.print.green(`${indentationStr}${AmplifyEvent.PostPush} is raised on the complete \
+execution of the amplify push command.`);   
+    context.print.warning('This feature is currently under actively development, \
+events might be added or removed in future releases');
 }
 
 function updatePackageJson(pluginDirPath: string, pluginName: string): void {

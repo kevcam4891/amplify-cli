@@ -53,7 +53,7 @@ async function plugIntoLocalAmplifyCli(context: Context, pluginDirPath: string):
 
 function printInfo(context: Context, pluginDirPath: string, isPluggedInLocalAmplifyCLI: boolean) {
     context.print.info('');
-    context.print.info(`The plugin package ${path.basename(pluginDirPath)} has been setup for further developments.`);
+    context.print.info(`The plugin package ${path.basename(pluginDirPath)} has been setup for developments.`);
     context.print.info('Next steps:');
 
     if (!isPluggedInLocalAmplifyCLI) {

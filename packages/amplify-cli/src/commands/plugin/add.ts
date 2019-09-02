@@ -75,7 +75,7 @@ async function addNewPluginPackage(context: Context) {
     });
 
     try {
-        const addUserPluginResult = addUserPluginPackage(context.pluginPlatform, answer.pluginDirPath);
+        const addUserPluginResult = addUserPluginPackage(context.pluginPlatform, answer.pluginDirPath.trim());
         if (addUserPluginResult.isAdded) {
             context.print.success('Successfully added plugin package.');
             await confirmAndScan(context.pluginPlatform);

@@ -88,7 +88,7 @@ export function displayPluginInfo(context: Context, pluginInfo: PluginInfo, grou
     context.print.info('');
 }
 
-function createIndentation(spaceCount: number): string{
+export function createIndentation(spaceCount: number): string{
     if(spaceCount == 0) return ''; 
     let charArray = [' ']; 
     while(charArray.length * 2 <= spaceCount){
@@ -97,5 +97,5 @@ function createIndentation(spaceCount: number): string{
     if (charArray.length < spaceCount){
         charArray = charArray.concat(charArray.slice(0, spaceCount - charArray.length));
     }
-    return charArray.join(); 
+    return charArray.join(''); 
 }
