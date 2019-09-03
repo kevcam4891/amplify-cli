@@ -89,7 +89,7 @@ function attachParameters(context: Context) {
     context.parameters.options = context.parameters.options || {};
     context.parameters.raw = argv;
     context.parameters.array = subCommands;
-    if (subCommands && subCommands.length > 1) {
+    if (subCommands && subCommands.length > 0) {
         if (subCommands.length > 0) {
             context.parameters.first = (<Array<string>>subCommands)[0];
         }
@@ -111,11 +111,15 @@ function attachRuntime(context: Context) {
         pluginInfos.forEach((pluginInfo) => {
             const name = path.basename(pluginInfo.packageLocation);
             const directory = pluginInfo.packageLocation;
+            const pluginName = pluginInfo.manifest.name;
+            const pluginType = pluginInfo.manifest.type;
             const commands = pluginInfo.manifest.commands;
             context.runtime.plugins.push({
                 name,
                 directory,
-                commands
+                pluginName,
+                pluginType,
+                commands,
             })
         })
     })

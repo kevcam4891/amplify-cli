@@ -40,11 +40,11 @@ async function plugIntoLocalAmplifyCli(context: Context, pluginDirPath: string):
             await confirmAndScan(context.pluginPlatform);
         } else {
             context.print.error('Failed to add the plugin package.');
-            context.print.infor(`Error code: ${addPluginResult.error}`);
+            context.print.info(`Error code: ${addPluginResult.error}`);
             if(addPluginResult.error === AddPluginError.FailedVerification && 
                 addPluginResult.pluginVerificationResult &&
                 addPluginResult.pluginVerificationResult.error){
-                context.print.infor(`Plugin verification error code: ${addPluginResult.pluginVerificationResult.error}`);
+                context.print.info(`Plugin verification error code: ${addPluginResult.pluginVerificationResult.error}`);
             }
         }
     }

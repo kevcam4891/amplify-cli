@@ -81,11 +81,11 @@ async function addNewPluginPackage(context: Context) {
             await confirmAndScan(context.pluginPlatform);
         } else {
             context.print.error('Failed to add the plugin package.');
-            context.print.infor(`Error code: ${addUserPluginResult.error}`);
+            context.print.info(`Error code: ${addUserPluginResult.error}`);
             if(addUserPluginResult.error === AddPluginError.FailedVerification && 
                 addUserPluginResult.pluginVerificationResult &&
                 addUserPluginResult.pluginVerificationResult.error){
-                context.print.infor(`Plugin verification error code: ${addUserPluginResult.pluginVerificationResult.error}`);
+                context.print.info(`Plugin verification error code: ${addUserPluginResult.pluginVerificationResult.error}`);
             }
         }
     } catch (e) {
