@@ -9,12 +9,13 @@ import { readJsonFileSync } from '../utils/readJsonFile';
 import constants from '../domain/constants';
 import { validPluginNameSync } from './verify-plugin'; 
 import { createIndentation } from './display-plugin-platform'; 
+import { conditionalExpression } from '@babel/types';
 
 
 export default async function newPlugin(context: Context, pluginParentDirPath: string): Promise<string | undefined>  {
     const pluginName = await getPluginName(context, pluginParentDirPath);
     if (pluginName) {
-        return await copyTemplateFiles(context, pluginParentDirPath, pluginName!);
+        return await copyAndUpdateTemplateFiles(context, pluginParentDirPath, pluginName!);
     } else {
         return undefined;
     }
@@ -65,14 +66,20 @@ async function getPluginName(context: Context, pluginParentDirPath: string): Pro
 }
 
 
-async function copyTemplateFiles(context: Context, pluginParentDirPath: string, pluginName: string) {
+async function copyAndUpdateTemplateFiles(context: Context, pluginParentDirPath: string, pluginName: string) {
     const pluginDirPath = path.join(pluginParentDirPath, pluginName);
     fs.emptyDirSync(pluginDirPath);
-    const srcDirPath = path.join(__dirname, '../../templates/new-plugin-package-js');
-    fs.copySync(srcDirPath, pluginDirPath);
 
     const pluginType = await promptForPluginType(context);
     const eventHandlers = await promptForEventSubscription(context);
+
+    let srcDirPath = path.join(__dirname, '../../templates/new-plugin');
+    if(pluginType === AmplifyPluginType.frontend.toString()){
+        srcDirPath = path.join(__dirname, '../../templates/new-plugin-frontend');
+    }else if(pluginType === AmplifyPluginType.provider.toString()){
+        srcDirPath = path.join(__dirname, '../../templates/new-plugin-provider');
+    }
+    fs.copySync(srcDirPath, pluginDirPath);
 
     updatePackageJson(pluginDirPath, pluginName);
     updateAmplifyPluginJson(pluginDirPath, pluginName, pluginType, eventHandlers);
@@ -102,13 +109,12 @@ async function promptForPluginType(context: Context): Promise<string> {
             displayAmplifyPluginTypesLearnMore(context);
             return await promptForPluginType(context);
         }else{
-            return  AmplifyPluginType.util; 
+            return  answer.selection; 
         }
     }
 }
 
 function displayAmplifyPluginTypesLearnMore(context: Context){
-    const indentationStr = createIndentation(4); 
     context.print.green('The Amplify CLI supports these plugin types:'); 
     context.print.blue(AmplifyPluginType.category); 
     context.print.green(`${AmplifyPluginType.category} plugins allows the CLI \

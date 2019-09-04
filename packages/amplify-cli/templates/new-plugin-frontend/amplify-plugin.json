@@ -8,13 +8,7 @@
     "eventHandlers":[
         "PreInit",
         "PostInit",
-        "PreAddResource",
-        "PostAddResource",
-        "PreRemoveResource",
-        "PostRemoveResource",
         "PrePush",
-        "PostPush",
-        "PreUpdateMeta",
-        "PostUpdateMeta"
+        "PostPush"
     ]
 }
