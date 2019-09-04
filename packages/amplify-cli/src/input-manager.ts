@@ -87,7 +87,7 @@ export function normailizeInput(input: Input): Input {
 }
 
 export function verifyInput(pluginPlatform: PluginPlatform, input: Input): InputVerificationResult {
-  const result = new InputVerificationResult(false);
+  const result = new InputVerificationResult();
 
   input.plugin = input.plugin || constants.CORE;
 
@@ -98,6 +98,11 @@ export function verifyInput(pluginPlatform: PluginPlatform, input: Input): Input
   if (pluginCandidates.length > 0) {
       for (let i = 0; i < pluginCandidates.length; i++) {
         const { commands, commandAliases } = pluginCandidates[i].manifest;
+
+        if ((commands && commands!.includes(Constant.HELP)) ||
+        (commandAliases && Object.keys(commandAliases).includes(Constant.HELP))) {
+            result.helpCommandAvailable = true;
+        }
         if ((commands && commands!.includes(input.command!)) ||
         (commandAliases && Object.keys(commandAliases).includes(input.command!))) {
             result.verified = true;

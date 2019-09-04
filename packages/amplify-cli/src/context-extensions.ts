@@ -44,6 +44,8 @@ export function attachExtentions(context: Context) {
     attachTemplate(context);
 }
 
+export { print }; 
+
 function attachPrompt(context: Context) {
     const inquirer = require('inquirer');
     context.prompt = {
@@ -164,18 +166,20 @@ function attachPatching(context: Context) {
 }
 
 function attachPrint(context: Context) {
-    context.print = {
-        info,
-        warning,
-        error,
-        success,
-        table,
-        debug,
-        green,
-        yellow,
-        red,
-        blue
-    };
+    context.print = print;
+}
+
+const print = {
+    info,
+    warning,
+    error,
+    success,
+    table,
+    debug,
+    green,
+    yellow,
+    red,
+    blue
 }
 
 function info(message: string): void {

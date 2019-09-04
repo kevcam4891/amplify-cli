@@ -4,7 +4,7 @@ import PluginInfo from './domain/plugin-info';
 import { readPluginsJsonFileSync, writePluginsJsonFileSync } from './plugin-helpers/access-plugins-file';
 import { scanPluginPlatform, getCorePluginDirPath, isUnderScanCoverageSync } from './plugin-helpers/scan-plugin-platform';
 import { verifyPlugin, verifyPluginSync } from './plugin-helpers/verify-plugin';
-import newPlugin from './plugin-helpers/new-plugin';
+import createNewPlugin from './plugin-helpers/create-new-plugin';
 import AddPluginResult, { AddPluginError } from './domain/add-plugin-result';
 import { twoPluginsAreTheSame } from './plugin-helpers/compare-plugins';
 import { AmplifyEvent } from './domain/amplify-event'; 
@@ -147,7 +147,7 @@ export async function scan(pluginPlatform?: PluginPlatform): Promise<PluginPlatf
 
 export { verifyPlugin };
 
-export { newPlugin };
+export { createNewPlugin };
 
 export async function confirmAndScan(pluginPlatform: PluginPlatform){
     const { confirmed } = await inquirer.prompt({

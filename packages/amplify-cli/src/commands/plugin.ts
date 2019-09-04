@@ -14,8 +14,8 @@ export async function run(context: Context) {
     .then(async (subCommandModule)=>{
         await subCommandModule.run(context);
     })
-    .catch((err)=>{
-        context.print.error(`Can not load command amplify plugin ${subCommand}`);
+    .catch(()=>{
+        context.print.error(`Cannot load command amplify plugin ${subCommand}`);
     })
 }
 

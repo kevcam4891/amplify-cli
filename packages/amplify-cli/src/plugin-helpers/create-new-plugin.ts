@@ -9,10 +9,9 @@ import { readJsonFileSync } from '../utils/readJsonFile';
 import constants from '../domain/constants';
 import { validPluginNameSync } from './verify-plugin'; 
 import { createIndentation } from './display-plugin-platform'; 
-import { conditionalExpression } from '@babel/types';
 
 
-export default async function newPlugin(context: Context, pluginParentDirPath: string): Promise<string | undefined>  {
+export default async function createNewPlugin(context: Context, pluginParentDirPath: string): Promise<string | undefined>  {
     const pluginName = await getPluginName(context, pluginParentDirPath);
     if (pluginName) {
         return await copyAndUpdateTemplateFiles(context, pluginParentDirPath, pluginName!);
@@ -73,11 +72,11 @@ async function copyAndUpdateTemplateFiles(context: Context, pluginParentDirPath:
     const pluginType = await promptForPluginType(context);
     const eventHandlers = await promptForEventSubscription(context);
 
-    let srcDirPath = path.join(__dirname, '../../templates/new-plugin');
+    let srcDirPath = path.join(__dirname, '../../templates/plugin-template');
     if(pluginType === AmplifyPluginType.frontend.toString()){
-        srcDirPath = path.join(__dirname, '../../templates/new-plugin-frontend');
+        srcDirPath = path.join(__dirname, '../../templates/plugin-template-frontend');
     }else if(pluginType === AmplifyPluginType.provider.toString()){
-        srcDirPath = path.join(__dirname, '../../templates/new-plugin-provider');
+        srcDirPath = path.join(__dirname, '../../templates/plugin-template-provider');
     }
     fs.copySync(srcDirPath, pluginDirPath);
 

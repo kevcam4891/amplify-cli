@@ -1,13 +1,13 @@
 import Context from '../../domain/context';
 import Constant from '../../domain/constants';
-import { newPlugin } from '../../plugin-manager';
+import { createNewPlugin } from '../../plugin-manager';
 import inquirer from '../../domain/inquirer-helper';
 import { addUserPluginPackage, confirmAndScan } from '../../plugin-manager';
 import { AddPluginError } from '../../domain/add-plugin-result';
 import path from 'path';
 
 export async function run(context: Context) {
-    const pluginDirPath = await newPlugin(context, process.cwd());
+    const pluginDirPath = await createNewPlugin(context, process.cwd());
     if (pluginDirPath) {
         const isPluggedInLocalAmplifyCLI = await plugIntoLocalAmplifyCli(context, pluginDirPath);
         printInfo(context, pluginDirPath, isPluggedInLocalAmplifyCLI);
