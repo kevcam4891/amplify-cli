@@ -110,9 +110,9 @@ export function verifyInput(pluginPlatform: PluginPlatform, input: Input): Input
         }
       }
       if (!result.verified) {
-        if(input.plugin === constants.CORE){
+        if (input.plugin === constants.CORE) {
           result.message = `The Amplify CLI can NOT find command: ${input.command}.`
-        }else{
+        } else {
           result.message = `The Amplify CLI can NOT find command: ${input.plugin} ${input.command}.`
         }
       }

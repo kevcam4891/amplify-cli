@@ -1,33 +1,34 @@
-const path = require('path'); 
+const path = require('path');
 
 const featureName = 'env';
 module.exports = {
   name: featureName,
   run: async (context) => {
-    let subcommand = 'help'; 
-    if(context.input.subCommands && context.input.subCommands.length > 0){
-        subcommand = context.input.subCommands[0];
+    const { subCommands } = context.input;
+    let subcommand = 'help';
+    if (subCommands && subCommands.length > 0) {
+      [subcommand] = subCommands;
     }
-    if(subcommand === 'help'){
-      displayHelp(); 
-    }else{
-      let commandModule; 
+    if (subcommand === 'help') {
+      displayHelp(context);
+    } else {
+      let commandModule;
 
-      try{
+      try {
         commandModule = require(path.normalize(path.join(__dirname, 'env', subcommand)));
-      }catch{
-        displayHelp(); 
+      } catch (e) {
+        displayHelp(context);
       }
 
-      if(commandModule){
-        await commandModule.run(context); 
+      if (commandModule) {
+        await commandModule.run(context);
       }
     }
   },
 };
 
 
-function displayHelp(){
+function displayHelp(context) {
   const header = `amplify ${featureName} <subcommands>`;
 
   const commands = [
@@ -62,6 +63,5 @@ function displayHelp(){
   ];
 
   context.amplify.showHelp(header, commands);
-
   context.print.info('');
 }

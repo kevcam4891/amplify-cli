@@ -44,7 +44,7 @@ export function attachExtentions(context: Context) {
     attachTemplate(context);
 }
 
-export { print }; 
+export { print };
 
 function attachPrompt(context: Context) {
     const inquirer = require('inquirer');

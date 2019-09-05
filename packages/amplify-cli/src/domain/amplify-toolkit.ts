@@ -66,7 +66,7 @@ export default class AmplifyToolkit {
     private _getTriggerEnvVariables: any;
     private _getTriggerEnvInputs: any;
 
-    private _amplifyHelpersDirPath: string = 
+    private _amplifyHelpersDirPath: string =
         path.normalize(path.join(__dirname, '../extensions/amplify-helpers'));
 
     get buildResources(): any {

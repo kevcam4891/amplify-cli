@@ -20,7 +20,7 @@ export async function readPluginsJsonFile(): Promise<PluginPlatform | undefined>
     const pluginsFilePath = path.join(os.homedir(),
         constants.DotAmplifyDirName, constants.PLUGINS_FILE_NAME);
 
-    const exists = await fs.pathExists(pluginsFilePath); 
+    const exists = await fs.pathExists(pluginsFilePath);
 
     if (exists) {
         result = await readJsonFile(pluginsFilePath)

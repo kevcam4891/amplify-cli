@@ -18,16 +18,16 @@ export function verifyPluginSync(pluginDirPath: string): PluginVerificationResul
 }
 
 export async function verifyPlugin(pluginDirPath: string): Promise<PluginVerificationResult> {
-    let exists = await fs.pathExists(pluginDirPath); 
-    if(exists){
+    let exists = await fs.pathExists(pluginDirPath);
+    if (exists) {
         const stat = await fs.stat(pluginDirPath);
-        if(!stat.isDirectory()){
-            exists = false; 
+        if (!stat.isDirectory()) {
+            exists = false;
         }
     }
-    if(exists){
+    if (exists) {
         return verifyNodePackage(pluginDirPath);
-    }else{
+    } else {
         return new PluginVerificationResult(
             false,
             PluginVerificationError.PluginDirPathNotExist
@@ -36,35 +36,33 @@ export async function verifyPlugin(pluginDirPath: string): Promise<PluginVerific
 }
 
 export type PluginNameValidationResult = {
-    isValid: boolean, 
+    isValid: boolean,
     message?: string
-} 
+}
 
-export function validPluginNameSync(pluginName: string): PluginNameValidationResult
-{
+export function validPluginNameSync(pluginName: string): PluginNameValidationResult {
     const result: PluginNameValidationResult = {
         isValid: true
-    }; 
-    const corePluginJson = readJsonFileSync(path.normalize(path.join(__dirname, '../../amplify-plugin.json'))); 
-    if(corePluginJson && corePluginJson.commands && corePluginJson.commands.includes(pluginName)){
-        result.isValid = false; 
+    };
+    const corePluginJson = readJsonFileSync(path.normalize(path.join(__dirname, '../../amplify-plugin.json')));
+    if (corePluginJson && corePluginJson.commands && corePluginJson.commands.includes(pluginName)) {
+        result.isValid = false;
         result.message = "Amplify CLI core comand names can not be used as plugin name"
     }
-    return result; 
+    return result;
 }
 
 
-export async function validPluginName(pluginName: string): Promise<PluginNameValidationResult>
-{
+export async function validPluginName(pluginName: string): Promise<PluginNameValidationResult> {
     const result: PluginNameValidationResult = {
         isValid: true
-    }; 
-    const corePluginJson = await readJsonFile(path.normalize(path.join(__dirname, '../../amplify-plugin.json'))); 
-    if(corePluginJson && corePluginJson.commands && corePluginJson.commands.includes(pluginName)){
-        result.isValid = false; 
+    };
+    const corePluginJson = await readJsonFile(path.normalize(path.join(__dirname, '../../amplify-plugin.json')));
+    if (corePluginJson && corePluginJson.commands && corePluginJson.commands.includes(pluginName)) {
+        result.isValid = false;
         result.message = "Amplify CLI core comand names can not be used as plugin name"
     }
-    return result; 
+    return result;
 }
 
 function verifyNodePackageSync(pluginDirPath: string): PluginVerificationResult {
@@ -112,13 +110,13 @@ function verifyAmplifyManifestSync(pluginDirPath: string, pluginModule: any): Pl
 
     try {
         const manifest = readJsonFileSync(pluginManifestFilePath) as PluginManifest;
-        let pluginNameValidationResult = validPluginNameSync(manifest.name); 
-        if(pluginNameValidationResult.isValid){
+        let pluginNameValidationResult = validPluginNameSync(manifest.name);
+        if (pluginNameValidationResult.isValid) {
             let result = verifyCommands(manifest, pluginModule);
-            result = result.verified ? verifyEventHandlers(manifest, pluginModule) : result; 
+            result = result.verified ? verifyEventHandlers(manifest, pluginModule) : result;
             result.manifest = manifest;
             return result;
-        }else{
+        } else {
             return new PluginVerificationResult(
                 false,
                 PluginVerificationError.InvalidManifest,
@@ -136,10 +134,10 @@ function verifyAmplifyManifestSync(pluginDirPath: string, pluginModule: any): Pl
 
 async function verifyAmplifyManifest(pluginDirPath: string, pluginModule: any): Promise<PluginVerificationResult> {
     const pluginManifestFilePath = path.join(pluginDirPath, constants.MANIFEST_FILE_NAME);
-    let exists = await fs.pathExists(pluginManifestFilePath); 
-    if(exists){
-        const stat = await fs.stat(pluginManifestFilePath); 
-        exists = stat.isFile(); 
+    let exists = await fs.pathExists(pluginManifestFilePath);
+    if (exists) {
+        const stat = await fs.stat(pluginManifestFilePath);
+        exists = stat.isFile();
     }
     if (!exists) {
         return new PluginVerificationResult(
@@ -150,13 +148,13 @@ async function verifyAmplifyManifest(pluginDirPath: string, pluginModule: any): 
 
     try {
         const manifest = await readJsonFile(pluginManifestFilePath) as PluginManifest;
-        let pluginNameValidationResult = await validPluginName(manifest.name); 
-        if(pluginNameValidationResult.isValid){
+        let pluginNameValidationResult = await validPluginName(manifest.name);
+        if (pluginNameValidationResult.isValid) {
             let result = verifyCommands(manifest, pluginModule);
-            result = result.verified ? verifyEventHandlers(manifest, pluginModule) : result; 
+            result = result.verified ? verifyEventHandlers(manifest, pluginModule) : result;
             result.manifest = manifest;
             return result;
-        }else{
+        } else {
             return new PluginVerificationResult(
                 false,
                 PluginVerificationError.InvalidManifest,

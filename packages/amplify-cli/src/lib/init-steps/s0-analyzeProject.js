@@ -146,14 +146,13 @@ async function getEnvName(context) {
       type: 'input',
       name: 'envName',
       message: 'Enter a name for the environment',
-      validate:  (inputEnvName) => {
-        const errorMessage = 'Environment name should be between 2 and 10 characters (only lowercase alphabets).'; 
-        if(inputEnvName && isEnvNameValid(inputEnvName)){
-            return true; 
-        }else{
-          return errorMessage; 
+      validate: (inputEnvName) => {
+        const errorMessage = 'Environment name should be between 2 and 10 characters (only lowercase alphabets).';
+        if (inputEnvName && isEnvNameValid(inputEnvName)) {
+          return true;
         }
-      }
+        return errorMessage;
+      },
     };
 
     ({ envName } = await inquirer.prompt(envNameQuestion));

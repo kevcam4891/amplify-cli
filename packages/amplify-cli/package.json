@@ -12,6 +12,8 @@
   "scripts": {
     "test": "jest",
     "test-ci": "jest --ci -i",
+    "lint": "./node_modules/.bin/tslint -c tslint.json 'src/**/*.ts' && eslint 'src/**/*.js'",
+    "lint-fix": "./node_modules/.bin/tslint --fix -c tslint.json 'src/**/*.ts' && eslint 'src/**/*.js' --fix",
     "postinstall": "node scripts/post-install.js",
     "build": "tsc",
     "start": "tsc -w",

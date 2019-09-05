@@ -41,26 +41,26 @@ export async function run(context: Context) {
             choices: options
         });
 
-        if(selections.length > 0){
-            const sequential = require('promise-sequential'); 
+        if (selections.length > 0) {
+            const sequential = require('promise-sequential');
             const removeTasks = selections.map((selection: Array<PluginInfo>) => {
                 return async () => {
                     await removeNamedPlugins(context.pluginPlatform, selection);
                 };
             });
-            await sequential(removeTasks); 
-            await confirmAndScan(context.pluginPlatform); 
+            await sequential(removeTasks);
+            await confirmAndScan(context.pluginPlatform);
         }
     } else {
         context.print.console.error('No plugins are found');
     }
 }
 
-async function removeNamedPlugins(pluginPlatform: PluginPlatform, pluginInfos: Array<PluginInfo>){
-    if(pluginInfos.length === 1){
+async function removeNamedPlugins(pluginPlatform: PluginPlatform, pluginInfos: Array<PluginInfo>) {
+    if (pluginInfos.length === 1) {
         removePluginPackage(pluginPlatform, pluginInfos[0]);
-    }else if(pluginInfos.length > 1){
-        const options = pluginInfos.map((pluginInfo: PluginInfo)=>{
+    } else if (pluginInfos.length > 1) {
+        const options = pluginInfos.map((pluginInfo: PluginInfo) => {
             return {
                 name: pluginInfo.packageName + '@' + pluginInfo.packageVersion,
                 value: pluginInfo,
@@ -74,14 +74,14 @@ async function removeNamedPlugins(pluginPlatform: PluginPlatform, pluginInfos: A
             choices: options
         });
 
-        if(selections.length > 0){
-            const sequential = require('promise-sequential'); 
+        if (selections.length > 0) {
+            const sequential = require('promise-sequential');
             const removeTasks = selections.map((pluginInfo: PluginInfo) => {
                 return async () => {
                     await removePluginPackage(pluginPlatform, pluginInfo);
                 };
             });
-            await sequential(removeTasks); 
+            await sequential(removeTasks);
         }
     }
 }
