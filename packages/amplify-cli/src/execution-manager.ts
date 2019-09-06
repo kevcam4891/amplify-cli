@@ -179,9 +179,9 @@ function attachContextExtensions(context: Context, plugin: PluginInfo) {
     const stats = fs.statSync(extensionsDirPath);
     if (stats.isDirectory()) {
       const itemNames = fs.readdirSync(extensionsDirPath);
-      itemNames.forEach((itemName)=>{
+      itemNames.forEach((itemName) => {
         const itemPath = path.join(extensionsDirPath, itemName);
-        let itemModule; 
+        let itemModule;
         try {
           itemModule = require(itemPath);
           itemModule(context);

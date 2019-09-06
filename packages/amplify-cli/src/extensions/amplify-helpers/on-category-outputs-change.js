@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const pathManager = require('./path-manager');
 const { getResourceOutputs } = require('./get-resource-outputs');
 const { readJsonFile } = require('./read-json-file');
@@ -26,23 +27,23 @@ async function onCategoryOutputsChange(context, cloudAmplifyMeta, localMeta) {
     );
   }
 
-  const outputChangedEventTasks = []; 
+  const outputChangedEventTasks = [];
   const categoryPlugins = context.amplify.getCategoryPlugins(context);
   Object.keys(categoryPlugins).forEach((pluginName) => {
-    const packageLocation = categoryPlugins[pluginName]; 
+    const packageLocation = categoryPlugins[pluginName];
     const pluginModule = require(packageLocation);
     if (pluginModule && typeof pluginModule.onAmplifyCategoryOutputChange === 'function') {
-      outputChangedEventTasks.push(async ()=>{
-        try{
+      outputChangedEventTasks.push(async () => {
+        try {
           attachContextExtensions(context, packageLocation);
           await pluginModule.onAmplifyCategoryOutputChange(context, cloudAmplifyMeta);
-        }catch(e){
-          //do nothing
+        } catch (e) {
+          // do nothing
         }
-      })
+      });
     }
   });
-  if(outputChangedEventTasks.length > 0){
+  if (outputChangedEventTasks.length > 0) {
     await sequential(outputChangedEventTasks);
   }
 }
@@ -53,16 +54,16 @@ function attachContextExtensions(context, packageLocation) {
     const stats = fs.statSync(extensionsDirPath);
     if (stats.isDirectory()) {
       const itemNames = fs.readdirSync(extensionsDirPath);
-      itemNames.forEach((itemName)=>{
+      itemNames.forEach((itemName) => {
         const itemPath = path.join(extensionsDirPath, itemName);
-        let itemModule; 
+        let itemModule;
         try {
           itemModule = require(itemPath);
           itemModule(context);
         } catch (e) {
           // do nothing
         }
-      })
+      });
     }
   }
 }
