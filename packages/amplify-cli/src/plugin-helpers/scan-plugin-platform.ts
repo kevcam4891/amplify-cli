@@ -22,7 +22,7 @@ export async function scanPluginPlatform(pluginPlatform?: PluginPlatform): Promi
   const sequential = require('promise-sequential');
 
   if (pluginPlatform!.userAddedLocations && pluginPlatform!.userAddedLocations.length > 0) {
-        // clean up the userAddedLocation first
+    // clean up the userAddedLocation first
     pluginPlatform!.userAddedLocations =
       pluginPlatform!.userAddedLocations.filter((pluginDirPath) => {
         const result = fs.existsSync(pluginDirPath);
