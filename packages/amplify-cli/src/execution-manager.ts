@@ -52,7 +52,7 @@ async function executePluginModuleCommand(context: Context, plugin: PluginInfo) 
     const pluginModule = require(plugin.packageLocation);
     if (pluginModule.hasOwnProperty(constants.ExecuteAmplifyCommand) &&
     typeof pluginModule[constants.ExecuteAmplifyCommand] === 'function') {
-      await attachContextExtensions(context, plugin);
+      attachContextExtensions(context, plugin);
       await pluginModule.executeAmplifyCommand(context);
     } else {
       // if the module does not have the executeAmplifyCommand method,
@@ -84,7 +84,7 @@ async function executePluginModuleCommand(context: Context, plugin: PluginInfo) 
       }
 
       if (commandModule) {
-        await attachContextExtensions(context, plugin);
+        attachContextExtensions(context, plugin);
         await commandModule.run(context);
       } else {
         const { showAllHelp } = require('./extensions/amplify-helpers/show-all-help');
@@ -159,7 +159,7 @@ export async function raiseEvent(context: Context, args: AmplifyEventArgs) {
     }).map((plugin) => {
       const eventHandler = async () => {
         try {
-          await attachContextExtensions(context, plugin);
+          attachContextExtensions(context, plugin);
           const pluginModule = require(plugin.packageLocation);
           await pluginModule.handleAmplifyEvent(context, args);
         } catch {
@@ -173,23 +173,22 @@ export async function raiseEvent(context: Context, args: AmplifyEventArgs) {
 }
 
 // for backward compatabilities, extensions to the context object
-async function attachContextExtensions(context: Context, plugin: PluginInfo) {
+function attachContextExtensions(context: Context, plugin: PluginInfo) {
   const extensionsDirPath = path.normalize(path.join(plugin.packageLocation, 'extensions'));
   if (fs.existsSync(extensionsDirPath)) {
     const stats = fs.statSync(extensionsDirPath);
     if (stats.isDirectory()) {
-      const fileNames = fs.readdirSync(extensionsDirPath);
-      fileNames.forEach(
-        fileName => async () => {
-          const extensionModulePath = path.join(extensionsDirPath, fileName);
-          try {
-            const extensionModule = require(extensionModulePath);
-            extensionModule(context);
-          } catch (e) {
-            // do nothing
-          }
-        },
-      );
+      const itemNames = fs.readdirSync(extensionsDirPath);
+      itemNames.forEach((itemName)=>{
+        const itemPath = path.join(extensionsDirPath, itemName);
+        let itemModule; 
+        try {
+          itemModule = require(itemPath);
+          itemModule(context);
+        } catch (e) {
+          // do nothing
+        }
+      })
     }
   }
 }
